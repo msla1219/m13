@@ -50,6 +50,10 @@ event ApprovalForAll:
     operator: indexed(address)
     approved: bool
 
+# three new public fields to the contract (MSL)
+name: public(String[32])
+symbol: public(String[32])
+idToURI: public(HashMap[uint256, String[53]])
 
 # @dev Mapping from NFT ID to the address that owns it.
 idToOwner: HashMap[uint256, address]
@@ -74,11 +78,6 @@ ERC165_INTERFACE_ID: constant(bytes32) = 0x0000000000000000000000000000000000000
 
 # @dev ERC165 interface ID of ERC721
 ERC721_INTERFACE_ID: constant(bytes32) = 0x0000000000000000000000000000000000000000000000000000000080ac58cd
-
-# three public fields to the contract (MSL)
-name: public(String[32])
-symbol: public(String[32])
-idToURL: public(HashMap[uint256, String[53]])
 
 @external
 def __init__(_name: String[32], _symbol: String[32]):
@@ -330,7 +329,7 @@ def setApprovalForAll(_operator: address, _approved: bool):
 ### MINT & BURN FUNCTIONS ###
 
 @external
-def mint(_to: address, _tokenId: uint256, _URL: String[53]) -> bool:
+def mint(_to: address, _tokenId: uint256, _URI: String[53]) -> bool:
     """
     @dev Function to mint tokens
          Throws if `msg.sender` is not the minter.
@@ -340,16 +339,16 @@ def mint(_to: address, _tokenId: uint256, _URL: String[53]) -> bool:
     @param _tokenId The token id to mint.
     @return A boolean that indicates if the operation was successful.
     """
+    
     # Throws if `msg.sender` is not the minter
     assert msg.sender == self.minter
-    
     # Throws if `_to` is zero address
     assert _to != ZERO_ADDRESS
     # Add NFT. Throws if `_tokenId` is owned by someone
     self._addTokenTo(_to, _tokenId)
-    
+
     # added by MSL
-    self.idToURL[_tokenId] = _URL
+    self.idToURI[_tokenId] = _URI
 
     log Transfer(ZERO_ADDRESS, _to, _tokenId)
     return True
